@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+     <div>
+        <button onclick="switchTask('t1')">Лічильник / Блоки</button>
+        <button onclick="switchTask('t2')">Ім'я / Модалка</button>
+        <button onclick="switchTask('t3')">Форум / Тест / Текст</button>
+        <button onclick="switchTask('t4')">Магазин книг</button>
+        <button onclick="switchTask('t5')">Журнал пар</button>
+    </div>
+
+    <hr>
+
+    <div id="t1" class="task-section">
+        <h3>Лічильник</h3>
+        <span id="counterVal">10</span>
+        <button onclick="changeCounter(1)">▲</button>
+        <button onclick="changeCounter(-1)">▼</button>
+        
+        <h3>Блоки</h3>
+        <button onclick="addColorBlock()">Add block</button>
+        <div id="blocksContainer"></div>
+    </div>
+
+    <div id="t2" class="task-section" style="display:none;">
+        <h3>Введення імені</h3>
+        <input type="text" id="nameInput">
+        
+        <h3>Модальне вікно</h3>
+        <button onclick="toggleModal(true)">Open modal</button>
+        <div id="modalOverlay" style="display:none;">
+            <div>
+                <h3>Hello from Modal Window!</h3>
+                <button onclick="toggleModal(false)">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="t3" class="task-section" style="display:none;">
+        <h3>Форум</h3>
+        <div id="forumList"></div>
+        <form id="forumForm" onsubmit="addForumMessage(event)">
+            <input type="text" id="forumName" required placeholder="Ім'я"><br>
+            <textarea id="forumMsg" required placeholder="Повідомлення"></textarea><br>
+            <button type="submit">Send</button>
+        </form>
+        
+        <h3>Тест</h3>
+        <div id="quizContent"></div>
+        
+        <h3>Стилізація тексту</h3>
+        <label><input type="checkbox" id="textBold" onchange="updateTextStyle()"> Bold</label>
+        <label><input type="checkbox" id="textUnderline" onchange="updateTextStyle()"> Underline</label>
+        <label><input type="checkbox" id="textItalic" onchange="updateTextStyle()"> Italics</label>
+        <input type="radio" name="textAlign" value="left" checked onchange="updateTextStyle()"> Left
+        <input type="radio" name="textAlign" value="right" onchange="updateTextStyle()"> Right
+        <input type="radio" name="textAlign" value="justify" onchange="updateTextStyle()"> Justify
+        <br>
+        <textarea id="styleTextSrc" oninput="updateTextStyle()"></textarea>
+    </div>
+
+    <div id="t4" class="task-section" style="display:none;">
+        <h3>Магазин книг</h3>
+        <div>
+            <button onclick="selectBook('Learning JavaScript')">Learning JavaScript - 16$</button>
+            <button onclick="selectBook('You Don\'t Know JS')">You Don't Know JS - 20$</button>
+            <button onclick="selectBook('JavaScript and JQuery')">JavaScript and JQuery - 22$</button>
+        </div>
+        <br>
+        <form id="bookForm" onsubmit="buyBook(event)">
+            Книга: <input type="text" id="bookTitle" readonly><br>
+            Кількість: <input type="number" id="bookQty" value="1" min="1"><br>
+            Ім'я: <input type="text" id="bookName" required><br>
+            Адреса: <input type="text" id="bookAddress" required><br>
+            Дата: <input type="text" id="bookDate" required><br>
+            Коментар: <textarea id="bookComment"></textarea><br>
+            <button type="submit">Buy</button>
+        </form>
+        <p id="bookResult"></p>
+    </div>
+
+    <div id="t5" class="task-section" style="display:none;">
+        <h3>Журнал пар</h3>
+        <select id="groupSel">
+            <option value="Group 1">Group 1</option>
+            <option value="Group 2">Group 2</option>
+        </select>
+        <select id="lessonSel">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </select>
+        <button onclick="loadLesson()">Select</button>
+        
+        <div id="lessonWorkspace" style="display: none;">
+            <br>Тема: <input type="text" id="lessonTopic"><br><br>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Is present</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsListTable"></tbody>
+            </table>
+            <button onclick="saveLesson()">Save</button>
+        </div>
+        <div id="lessonViewSpace" style="display: none;"></div>
+    </div>
+
+    <script>
+        function switchTask(taskId) {
+            document.querySelectorAll('.task-section').forEach(s => s.style.display = 'none');
+            document.getElementById(taskId).style.display = 'block';
+        }
+
+        function changeCounter(val) {
+            const el = document.getElementById('counterVal');
+            el.textContent = parseInt(el.textContent) + val;
+        }
+
+        function addColorBlock() {
+            const block = document.createElement('div');
+            block.style.width = '50px';
+            block.style.height = '30px';
+            block.style.display = 'inline-block';
+            block.style.margin = '5px';
+            block.style.backgroundColor = `rgb(${Math.floor(Math.random()*256)},${Math.floor(Math.random()*256)},${Math.floor(Math.random()*256)})`;
+            block.onclick = function() { this.remove(); };
+            document.getElementById('blocksContainer').appendChild(block);
+        }
+
+        document.getElementById('nameInput').addEventListener('keydown', function(e) {
+            if (e.key >= '0' && e.key <= '9') e.preventDefault();
+        });
+
+        function toggleModal(show) {
+            document.getElementById('modalOverlay').style.display = show ? 'block' : 'none';
+        }
+
+        function addForumMessage(e) {
+            e.preventDefault();
+            const name = document.getElementById('forumName').value;
+            const msg = document.getElementById('forumMsg').value;
+            const time = new Date().toLocaleTimeString();
+            const item = document.createElement('div');
+            item.innerHTML = `<b>${name}</b> <i>${time}</i><p>${msg}</p><hr>`;
+            document.getElementById('forumList').appendChild(item);
+            document.getElementById('forumForm').reset();
+        }
+
+        const quizData = [
+            { q: "1) Скільки літер у слові 'Hello'?", a1: "5", a2: "2", right: 1 },
+            { q: "2) Скільки літер у слові 'World'?", a1: "4", a2: "5", right: 2 }
+        ];
+        let currentQ = 0, score = 0;
+
+        function renderQuiz() {
+            const box = document.getElementById('quizContent');
+            if (currentQ < quizData.length) {
+                box.innerHTML = `
+                    <p><b>${quizData[currentQ].q}</b></p>
+                    <label><input type="radio" name="quizAns" value="1" checked> ${quizData[currentQ].a1}</label><br>
+                    <label><input type="radio" name="quizAns" value="2"> ${quizData[currentQ].a2}</label><br><br>
+                    <button onclick="submitQuizAnswer()">${currentQ === quizData.length - 1 ? 'Finish' : 'Next'}</button>
+                `;
+            } else {
+                box.innerHTML = `<h4>Результат: ${score} з ${quizData.length}</h4>`;
+            }
+        }
+        function submitQuizAnswer() {
+            const ans = document.querySelector('input[name="quizAns"]:checked').value;
+            if (parseInt(ans) === quizData[currentQ].right) score++;
+            currentQ++;
+            renderQuiz();
+        }
+        renderQuiz();
+
+        function updateTextStyle() {
+            const src = document.getElementById('styleTextSrc');
+            src.style.fontWeight = document.getElementById('textBold').checked ? 'bold' : 'normal';
+            src.style.textDecoration = document.getElementById('textUnderline').checked ? 'underline' : 'none';
+            src.style.fontStyle = document.getElementById('textItalic').checked ? 'italic' : 'normal';
+            src.style.textAlign = document.querySelector('input[name="textAlign"]:checked').value;
+        }
+
+        function selectBook(title) {
+            document.getElementById('bookTitle').value = title;
+        }
+        function buyBook(e) {
+            e.preventDefault();
+            const bTitle = document.getElementById('bookTitle').value;
+            const name = document.getElementById('bookName').value;
+            const qty = document.getElementById('bookQty').value;
+            const addr = document.getElementById('bookAddress').value;
+            const date = document.getElementById('bookDate').value;
+            if (!bTitle) return;
+            document.getElementById('bookResult').textContent = `${name}, дякуємо за замовлення. ${qty} шт. товару "${bTitle}" буде доставлено ${date} на адресу ${addr}.`;
+        }
+
+        const journalStorage = {};
+        const studentsMock = ["Студент 1", "Студент 2", "Студент 3"];
+
+        function loadLesson() {
+            const key = `${document.getElementById('groupSel').value}_${document.getElementById('lessonSel').value}`;
+            if (journalStorage[key]) {
+                document.getElementById('lessonWorkspace').style.display = 'none';
+                let html = `<p><b>Тема:</b> ${journalStorage[key].topic}</p><table border="1">`;
+                journalStorage[key].attendance.forEach(s => {
+                    html += `<tr><td>${s.name}</td><td>${s.present ? 'present' : 'absent'}</td></tr>`;
+                });
+                document.getElementById('lessonViewSpace').innerHTML = html + `</table>`;
+                document.getElementById('lessonViewSpace').style.display = 'block';
+            } else {
+                document.getElementById('lessonViewSpace').style.display = 'none';
+                document.getElementById('lessonWorkspace').style.display = 'block';
+                document.getElementById('lessonTopic').value = '';
+                const tbody = document.getElementById('studentsListTable');
+                tbody.innerHTML = '';
+                studentsMock.forEach(name => {
+                    tbody.innerHTML += `<tr><td>${name}</td><td><input type="checkbox" class="student-pres-cb" data-name="${name}"></td></tr>`;
+                });
+            }
+        }
+        function saveLesson() {
+            const key = `${document.getElementById('groupSel').value}_${document.getElementById('lessonSel').value}`;
+            const attendance = [];
+            document.querySelectorAll('.student-pres-cb').forEach(cb => {
+                attendance.push({ name: cb.getAttribute('data-name'), present: cb.checked });
+            });
+            journalStorage[key] = { topic: document.getElementById('lessonTopic').value, attendance: attendance };
+            loadLesson();
+        }
+    </script>
+</body>
+</html>
